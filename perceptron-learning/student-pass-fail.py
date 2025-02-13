@@ -10,14 +10,14 @@ considered fail
 dataset = pd.read_excel("student-pass-fail-data.xlsx")
 
 X = np.array(dataset[['Maths', 'Science']].values)
-y = [0 if result == "pass" else 1 for result in dataset["Result"]]
+y = [1 if result == "pass" else -1 for result in dataset["Result"]]
 
 weights = np.zeros(X.shape[1])
 bias = 0
 learning_rate = 0.01
 
 def step_function(z):
-    return 1 if z >= 0 else 0
+    return 1 if z >= 0 else -1
 
 epochs = 5000
 
@@ -35,7 +35,6 @@ for epoch in range(epochs):
         print("Model converged at epochs:", epoch)
         break
 
-print(weights, bias)
 def predict(student_features):
     output = np.dot(student_features, weights) + bias
     return step_function(output)
