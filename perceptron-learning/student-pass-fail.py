@@ -1,41 +1,41 @@
 import numpy as np
+import pandas as pd
 
-X = np.array([
-    [32, 50],
-    [10, 42],
-    [40, 45],
-    [55, 10],
-    [35, 50],
-    [25, 20],
-    [32, 30],
-    [50, 50],
-    [35, 35],
-    [42, 60],
-    [39, 30],
-    [20, 30],
-    [10, 50]
-])
+"""
+There are two subjects in the dataset, the student is considered pass if
+the sum of the both subjects marks are greater than or equal to 70, else
+considered fail
+"""
 
-y = np.array([1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0])
+dataset = pd.read_excel("student-pass-fail-data.xlsx")
+
+X = np.array(dataset[['Maths', 'Science']].values)
+y = [0 if result == "pass" else 1 for result in dataset["Result"]]
 
 weights = np.zeros(X.shape[1])
 bias = 0
-learning_rate = 0.5
+learning_rate = 0.01
 
 def step_function(z):
-    return 1 if z >= 0 else -1
+    return 1 if z >= 0 else 0
 
 epochs = 5000
 
 for epoch in range(epochs):
+    errors = 0
     for i in range(len(X)):
         linear_output = np.dot(X[i], weights) + bias
         prediction = step_function(linear_output)
         error = y[i] - prediction
-        weights += learning_rate * error * X[i]
-        bias += learning_rate * error
+        if error != 0:
+            weights += learning_rate * error * X[i]
+            bias += learning_rate * error
+            errors += 1
+    if errors == 0:
+        print("Model converged at epochs:", epoch)
+        break
 
-
+print(weights, bias)
 def predict(student_features):
     output = np.dot(student_features, weights) + bias
     return step_function(output)
@@ -45,6 +45,11 @@ test_data = np.array([
     [45, 45], # Pass
     [49, 30], # Pass
     [12, 50], # Fail
+    [70, 0],  # Pass
+    [0, 70],  # Pass
+    [69, 0], # Fail
+    [0, 69], # Fail
+    [0, 0] # Fail
 ])
 
 for i in range(len(test_data)):
